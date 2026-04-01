@@ -1,0 +1,422 @@
+export interface District {
+  id: string;
+  name: string;
+  division: string;
+  image: string;
+  description: string;
+  productCount: number;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+  images: string[];
+  district: string;
+  districtId: string;
+  category: string;
+  categoryId: string;
+  rating: number;
+  reviewCount: number;
+  description: string;
+  artisanId: string;
+  inStock: boolean;
+  craftProcess?: string;
+  culturalSignificance?: string;
+}
+
+export interface Artisan {
+  id: string;
+  name: string;
+  image: string;
+  district: string;
+  districtId: string;
+  specialty: string;
+  bio: string;
+  story: string;
+  yearsOfExperience: number;
+  productCount: number;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  image: string;
+  description: string;
+  productCount: number;
+}
+
+export interface Testimonial {
+  id: string;
+  name: string;
+  location: string;
+  avatar: string;
+  rating: number;
+  text: string;
+  product: string;
+}
+
+export const districts: District[] = [
+  { id: 'rangpur', name: 'Rangpur', division: 'Rangpur', image: 'https://images.unsplash.com/photo-1590579491624-f98f36d4c763?w=600&q=80', description: 'Famous for Shataranji weaving and traditional textiles', productCount: 124 },
+  { id: 'jamalpur', name: 'Jamalpur', division: 'Mymensingh', image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80', description: 'Known for Nakshi Kantha and embroidery work', productCount: 98 },
+  { id: 'tangail', name: 'Tangail', division: 'Dhaka', image: 'https://images.unsplash.com/photo-1601662528567-526cd06f6582?w=600&q=80', description: 'Home of the famous Tangail Saree', productCount: 156 },
+  { id: 'rajshahi', name: 'Rajshahi', division: 'Rajshahi', image: '/images/districts/rajshahi.jpg', description: 'Renowned for silk products and pottery', productCount: 134 },
+  { id: 'chapainawabganj', name: 'Chapainawabganj', division: 'Rajshahi', image: 'https://images.unsplash.com/photo-1516733968668-dbdce39c0651?w=600&q=80', description: 'Famous for mango wood crafts and traditional art', productCount: 87 },
+  { id: 'sylhet', name: 'Sylhet', division: 'Sylhet', image: '/images/districts/sylhet.jpg', description: 'Known for cane and bamboo crafts', productCount: 112 },
+  { id: 'coxs-bazar', name: "Cox's Bazar", division: 'Chattogram', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80', description: 'Famous for seashell crafts and coastal art', productCount: 76 },
+  { id: 'khulna', name: 'Khulna', division: 'Khulna', image: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=600&q=80', description: 'Known for Sundarbans-inspired crafts', productCount: 93 },
+  { id: 'dhaka', name: 'Dhaka', division: 'Dhaka', image: '/images/districts/dhaka.jpg', description: 'Home of legendary Jamdani weaving', productCount: 203 },
+  { id: 'comilla', name: 'Comilla', division: 'Chattogram', image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600&q=80', description: 'Famous for Khadi and traditional textiles', productCount: 145 },
+  { id: 'mymensingh', name: 'Mymensingh', division: 'Mymensingh', image: 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=600&q=80', description: 'Known for folk art and pottery', productCount: 89 },
+  { id: 'bogra', name: 'Bogra', division: 'Rajshahi', image: 'https://images.unsplash.com/photo-1590579491624-f98f36d4c763?w=600&q=80', description: 'Famous for terracotta and clay crafts', productCount: 67 },
+];
+
+export const categories: Category[] = [
+  { id: 'jamdani', name: 'Jamdani', image: '/images/products/jamdani-saree.jpg', description: 'Exquisite hand-woven muslin fabric with intricate patterns, a UNESCO heritage craft', productCount: 89 },
+  { id: 'nakshi-kantha', name: 'Nakshi Kantha', image: '/images/products/nakshi-kantha.jpg', description: 'Traditional embroidered quilts telling stories through thread', productCount: 156 },
+  { id: 'bamboo-crafts', name: 'Bamboo Crafts', image: '/images/products/bamboo-basket.jpg', description: 'Sustainable handcrafted items from natural bamboo', productCount: 112 },
+  { id: 'clay-pottery', name: 'Clay Pottery', image: '/images/products/terracotta-pottery.jpg', description: 'Traditional terracotta and ceramic artistry', productCount: 78 },
+  { id: 'cane-furniture', name: 'Cane Furniture', image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80', description: 'Elegant and durable handwoven cane pieces', productCount: 45 },
+  { id: 'handwoven-textiles', name: 'Handwoven Textiles', image: 'https://images.unsplash.com/photo-1601662528567-526cd06f6582?w=600&q=80', description: 'Beautiful fabrics crafted on traditional looms', productCount: 234 },
+];
+
+export const products: Product[] = [
+  {
+    id: 'jamdani-saree-001',
+    name: 'Traditional Jamdani Saree - Midnight Blue',
+    price: 15000,
+    originalPrice: 18000,
+    image: '/images/products/jamdani-saree.jpg',
+    images: [
+      '/images/products/jamdani-saree.jpg',
+      'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&q=80',
+      'https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=600&q=80',
+    ],
+    district: 'Dhaka',
+    districtId: 'dhaka',
+    category: 'Jamdani',
+    categoryId: 'jamdani',
+    rating: 4.9,
+    reviewCount: 128,
+    description: 'An exquisite hand-woven Jamdani saree featuring intricate geometric patterns on a midnight blue base. Each saree takes 3-6 months to complete by master weavers.',
+    artisanId: 'artisan-001',
+    inStock: true,
+    craftProcess: 'The Jamdani weaving technique involves creating patterns by hand during the weaving process, using a supplementary weft technique. Master weavers work from memory, passing down designs through generations.',
+    culturalSignificance: 'Jamdani is a UNESCO Intangible Cultural Heritage, representing centuries of Bengali weaving excellence. Traditionally worn during festivals and weddings.',
+  },
+  {
+    id: 'nakshi-kantha-002',
+    name: 'Floral Nakshi Kantha Bedspread',
+    price: 8500,
+    image: '/images/products/nakshi-kantha.jpg',
+    images: [
+      '/images/products/nakshi-kantha.jpg',
+      'https://images.unsplash.com/photo-1616627561839-074385245ff6?w=600&q=80',
+    ],
+    district: 'Jamalpur',
+    districtId: 'jamalpur',
+    category: 'Nakshi Kantha',
+    categoryId: 'nakshi-kantha',
+    rating: 4.8,
+    reviewCount: 89,
+    description: 'A stunning handmade Nakshi Kantha bedspread featuring traditional floral motifs. Made using centuries-old embroidery techniques passed down through generations.',
+    artisanId: 'artisan-002',
+    inStock: true,
+    craftProcess: 'Nakshi Kantha involves layers of old saris stitched together with running stitches, creating beautiful patterns. Each piece takes 2-4 months to complete.',
+    culturalSignificance: 'Originally made by rural women to recycle old saris, Nakshi Kantha has become a symbol of Bengali folk art and female creativity.',
+  },
+  {
+    id: 'bamboo-basket-003',
+    name: 'Handwoven Bamboo Storage Basket Set',
+    price: 2500,
+    originalPrice: 3000,
+    image: '/images/products/bamboo-basket.jpg',
+    images: [
+      '/images/products/bamboo-basket.jpg',
+      'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=600&q=80',
+    ],
+    district: 'Sylhet',
+    districtId: 'sylhet',
+    category: 'Bamboo Crafts',
+    categoryId: 'bamboo-crafts',
+    rating: 4.7,
+    reviewCount: 156,
+    description: 'A set of three beautifully handwoven bamboo baskets, perfect for storage and home décor. Made from sustainably sourced bamboo.',
+    artisanId: 'artisan-003',
+    inStock: true,
+    craftProcess: 'Bamboo is split, treated, and woven by hand using traditional techniques. Each basket is shaped and finished with natural dyes.',
+    culturalSignificance: 'Bamboo weaving is an ancient craft in Bangladesh, used for everything from household items to fishing equipment.',
+  },
+  {
+    id: 'terracotta-vase-004',
+    name: 'Terracotta Decorative Vase',
+    price: 1800,
+    image: '/images/products/terracotta-pottery.jpg',
+    images: [
+      '/images/products/terracotta-pottery.jpg',
+      'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?w=600&q=80',
+    ],
+    district: 'Rajshahi',
+    districtId: 'rajshahi',
+    category: 'Clay Pottery',
+    categoryId: 'clay-pottery',
+    rating: 4.6,
+    reviewCount: 67,
+    description: 'A stunning terracotta vase featuring traditional Bengali motifs. Hand-shaped and fired using traditional kiln methods.',
+    artisanId: 'artisan-004',
+    inStock: true,
+    craftProcess: 'Clay is hand-shaped on a traditional wheel, decorated with motifs, and fired in a wood-burning kiln.',
+    culturalSignificance: 'Terracotta pottery has been part of Bengali culture for millennia, used in temples, homes, and festivals.',
+  },
+  {
+    id: 'silk-scarf-005',
+    name: 'Rajshahi Silk Scarf - Golden Paisley',
+    price: 4500,
+    image: 'https://images.unsplash.com/photo-1601662528567-526cd06f6582?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1601662528567-526cd06f6582?w=600&q=80',
+      'https://images.unsplash.com/photo-1594040226829-7f251ab46d80?w=600&q=80',
+    ],
+    district: 'Rajshahi',
+    districtId: 'rajshahi',
+    category: 'Handwoven Textiles',
+    categoryId: 'handwoven-textiles',
+    rating: 4.8,
+    reviewCount: 92,
+    description: 'A luxurious pure silk scarf from Rajshahi, featuring elegant paisley patterns in rich golden tones.',
+    artisanId: 'artisan-005',
+    inStock: true,
+    craftProcess: 'Pure silk threads are hand-dyed and woven on traditional looms to create intricate patterns.',
+    culturalSignificance: 'Rajshahi is known as the "Silk City" of Bangladesh, with silk weaving traditions dating back centuries.',
+  },
+  {
+    id: 'tangail-saree-006',
+    name: 'Tangail Cotton Saree - Ruby Red',
+    price: 6500,
+    image: 'https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=600&q=80',
+      'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600&q=80',
+    ],
+    district: 'Tangail',
+    districtId: 'tangail',
+    category: 'Handwoven Textiles',
+    categoryId: 'handwoven-textiles',
+    rating: 4.7,
+    reviewCount: 143,
+    description: 'A beautiful handwoven Tangail cotton saree in vibrant ruby red with traditional border designs.',
+    artisanId: 'artisan-006',
+    inStock: true,
+    craftProcess: 'Tangail sarees are woven using extra warp technique, creating distinctive patterns and textures.',
+    culturalSignificance: 'Tangail sarees are an integral part of Bengali identity, worn during festivals and special occasions.',
+  },
+  {
+    id: 'cane-chair-007',
+    name: 'Traditional Cane Peacock Chair',
+    price: 12000,
+    originalPrice: 14000,
+    image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&q=80',
+      'https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=600&q=80',
+    ],
+    district: 'Sylhet',
+    districtId: 'sylhet',
+    category: 'Cane Furniture',
+    categoryId: 'cane-furniture',
+    rating: 4.9,
+    reviewCount: 34,
+    description: 'An iconic peacock chair handwoven from natural cane. A statement piece that brings bohemian elegance to any space.',
+    artisanId: 'artisan-003',
+    inStock: true,
+    craftProcess: 'Cane is soaked, bent into shape, and woven by skilled craftsmen using techniques passed down through generations.',
+    culturalSignificance: 'Cane furniture represents sustainable craftsmanship and has been a part of Bengali homes for centuries.',
+  },
+  {
+    id: 'nakshi-kantha-wall-008',
+    name: 'Nakshi Kantha Wall Hanging - Village Scene',
+    price: 5500,
+    image: 'https://images.unsplash.com/photo-1616627561839-074385245ff6?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1616627561839-074385245ff6?w=600&q=80',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+    ],
+    district: 'Rangpur',
+    districtId: 'rangpur',
+    category: 'Nakshi Kantha',
+    categoryId: 'nakshi-kantha',
+    rating: 4.8,
+    reviewCount: 78,
+    description: 'A beautiful wall hanging depicting a traditional Bengali village scene, hand-embroidered using the Nakshi Kantha technique.',
+    artisanId: 'artisan-007',
+    inStock: true,
+    craftProcess: 'Multiple layers of fabric are stitched together with running stitches to create pictorial narratives.',
+    culturalSignificance: 'Nakshi Kantha art often tells stories of daily life, mythology, and nature, preserving Bengali folk traditions.',
+  },
+];
+
+export const artisans: Artisan[] = [
+  {
+    id: 'artisan-001',
+    name: 'Fatima Begum',
+    image: '/images/artisans/fatima-begum.jpg',
+    district: 'Dhaka',
+    districtId: 'dhaka',
+    specialty: 'Jamdani Weaving',
+    bio: 'Master weaver with 30 years of experience in traditional Jamdani craft.',
+    story: 'Fatima learned the art of Jamdani weaving from her grandmother at age 12. Today, she leads a cooperative of 15 women weavers in Sonargaon, preserving this UNESCO heritage craft while providing sustainable livelihoods for rural women. Her intricate designs have been showcased internationally, and she has trained over 100 young weavers in traditional techniques.',
+    yearsOfExperience: 30,
+    productCount: 45,
+  },
+  {
+    id: 'artisan-002',
+    name: 'Rashida Khatun',
+    image: '/images/artisans/rashida-khatun.jpg',
+    district: 'Jamalpur',
+    districtId: 'jamalpur',
+    specialty: 'Nakshi Kantha Embroidery',
+    bio: 'Award-winning Nakshi Kantha artist keeping alive the storytelling tradition.',
+    story: 'Born into a family of Kantha makers, Rashida has elevated this folk art to new heights. Each of her pieces tells a story - from ancient mythology to contemporary life. Her work has been exhibited in galleries across Asia, and she actively teaches young women in her village, ensuring this beautiful tradition continues for generations to come.',
+    yearsOfExperience: 25,
+    productCount: 67,
+  },
+  {
+    id: 'artisan-003',
+    name: 'Abdul Karim',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80',
+    district: 'Sylhet',
+    districtId: 'sylhet',
+    specialty: 'Bamboo & Cane Crafts',
+    bio: 'Third-generation bamboo craftsman creating sustainable art.',
+    story: 'Abdul\'s family has been working with bamboo for three generations. Growing up surrounded by lush bamboo groves, he learned to see beauty and possibility in every stalk. His innovative designs blend traditional techniques with contemporary aesthetics, creating pieces that are both functional and artistic. He sources all materials sustainably from local forests.',
+    yearsOfExperience: 35,
+    productCount: 89,
+  },
+  {
+    id: 'artisan-004',
+    name: 'Kamal Uddin',
+    image: '/images/artisans/kamal-uddin.jpg',
+    district: 'Rajshahi',
+    districtId: 'rajshahi',
+    specialty: 'Terracotta Pottery',
+    bio: 'Contemporary potter honoring ancient Bengali clay traditions.',
+    story: 'Nazma discovered her passion for clay as a young girl watching the potters of her village. After studying traditional and modern ceramics, she returned to her roots, establishing a studio that celebrates Bengali terracotta heritage while exploring new forms and glazes. Her work graces homes and galleries worldwide.',
+    yearsOfExperience: 18,
+    productCount: 56,
+  },
+  {
+    id: 'artisan-005',
+    name: 'Mohammad Hasan',
+    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&q=80',
+    district: 'Rajshahi',
+    districtId: 'rajshahi',
+    specialty: 'Silk Weaving',
+    bio: 'Master silk weaver preserving Rajshahi\'s textile heritage.',
+    story: 'In the heart of Bangladesh\'s "Silk City," Mohammad carries forward a family tradition spanning five generations. His silk creations combine centuries-old techniques with contemporary designs, resulting in textiles that are both timeless and modern. He is dedicated to training young weavers and ensuring the survival of this precious craft.',
+    yearsOfExperience: 40,
+    productCount: 78,
+  },
+  {
+    id: 'artisan-006',
+    name: 'Salma Begum',
+    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&q=80',
+    district: 'Tangail',
+    districtId: 'tangail',
+    specialty: 'Tangail Saree Weaving',
+    bio: 'Expert weaver specializing in traditional Tangail sarees.',
+    story: 'Salma represents the proud weaving tradition of Tangail, known throughout Bangladesh for its distinctive cotton sarees. Working on her family\'s handloom, she creates sarees that are worn at festivals and celebrations across the country. Her dedication to quality and traditional patterns has earned her recognition from the government.',
+    yearsOfExperience: 22,
+    productCount: 123,
+  },
+  {
+    id: 'artisan-007',
+    name: 'Amina Khatun',
+    image: 'https://images.unsplash.com/photo-1607746882042-944635dfe10e?w=600&q=80',
+    district: 'Rangpur',
+    districtId: 'rangpur',
+    specialty: 'Nakshi Kantha & Shataranji',
+    bio: 'Versatile textile artist working in multiple traditional mediums.',
+    story: 'Amina\'s artistic journey began with Nakshi Kantha but expanded to include Shataranji weaving, the famous floor covering of Rangpur. Her innovative approach combines both crafts, creating unique pieces that celebrate the textile heritage of northern Bangladesh. She leads a women\'s cooperative that provides employment to over 50 rural artisans.',
+    yearsOfExperience: 28,
+    productCount: 91,
+  },
+];
+
+export const testimonials: Testimonial[] = [
+  {
+    id: 'testimonial-001',
+    name: 'Sarah Mitchell',
+    location: 'New York, USA',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80',
+    rating: 5,
+    text: 'The Jamdani saree I purchased is absolutely breathtaking. The craftsmanship is exquisite, and knowing it was handmade by a master weaver makes it even more special. Worth every penny!',
+    product: 'Traditional Jamdani Saree',
+  },
+  {
+    id: 'testimonial-002',
+    name: 'James Chen',
+    location: 'Toronto, Canada',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
+    rating: 5,
+    text: 'I bought a set of bamboo baskets for my home, and they exceeded all expectations. Beautiful, functional, and sustainable. The shipping was fast and the packaging was eco-friendly too.',
+    product: 'Bamboo Storage Basket Set',
+  },
+  {
+    id: 'testimonial-003',
+    name: 'Priya Sharma',
+    location: 'London, UK',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80',
+    rating: 5,
+    text: 'The Nakshi Kantha bedspread is a work of art. Each stitch tells a story, and I love knowing that my purchase supports rural artisans. This platform is doing wonderful work.',
+    product: 'Floral Nakshi Kantha Bedspread',
+  },
+  {
+    id: 'testimonial-004',
+    name: 'Ahmed Rahman',
+    location: 'Dubai, UAE',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=80',
+    rating: 5,
+    text: 'Being a Bangladeshi expat, finding authentic handcrafted items is always a joy. This platform connects me to my roots while supporting the artisans back home. Highly recommended!',
+    product: 'Terracotta Decorative Vase',
+  },
+];
+
+export function getProductsByDistrict(districtId: string): Product[] {
+  return products.filter(p => p.districtId === districtId);
+}
+
+export function getProductsByCategory(categoryId: string): Product[] {
+  return products.filter(p => p.categoryId === categoryId);
+}
+
+export function getProductById(productId: string): Product | undefined {
+  return products.find(p => p.id === productId);
+}
+
+export function getArtisanById(artisanId: string): Artisan | undefined {
+  return artisans.find(a => a.id === artisanId);
+}
+
+export function getDistrictById(districtId: string): District | undefined {
+  return districts.find(d => d.id === districtId);
+}
+
+export function getCategoryById(categoryId: string): Category | undefined {
+  return categories.find(c => c.id === categoryId);
+}
+
+export function searchProducts(query: string): Product[] {
+  const lowerQuery = query.toLowerCase();
+  return products.filter(p => 
+    p.name.toLowerCase().includes(lowerQuery) ||
+    p.district.toLowerCase().includes(lowerQuery) ||
+    p.category.toLowerCase().includes(lowerQuery) ||
+    p.description.toLowerCase().includes(lowerQuery)
+  );
+}
+
+export function formatPrice(price: number): string {
+  return `৳${price.toLocaleString('en-BD')}`;
+}
