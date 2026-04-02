@@ -45,7 +45,7 @@ const team = [
   {
     name: "Rita Khatun",
     role: "Head of Artisan Relations",
-    image: "",
+    image: "/assets/rita.jpeg",
     bio: "Works directly with artisan communities across all 64 districts.",
   },
   {
@@ -57,7 +57,7 @@ const team = [
   {
     name: "Noshin Nawar Parika",
     role: "Assistant Creative Director",
-    image: "parr.jpeg",
+    image: "/assets/parikaaa.jpeg",
     bio: "Curates our collection and works with artisans on product development.",
   },
 ];
