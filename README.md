@@ -56,6 +56,17 @@ npm run dev:client
 Backend runs on `http://localhost:5000`  
 Frontend runs on `http://localhost:3000`
 
+## What To Update After Clone
+
+Update these values with valid data for your machine or hosted services:
+
+- `backend/.env`
+  - `DATABASE_URL` (PostgreSQL connection string)
+  - `JWT_SECRET` (any long random string)
+  - `CORS_ORIGIN` (frontend URL, default `http://localhost:3000`)
+- `client/.env.local`
+  - `NEXT_PUBLIC_API_BASE_URL` (backend base URL, default `http://localhost:5000/api`)
+
 ## Prerequisites
 
 1. Node.js 20+
