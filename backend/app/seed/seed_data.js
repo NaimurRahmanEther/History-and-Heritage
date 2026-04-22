@@ -437,12 +437,17 @@ async function seedData() {
 
     const adminHash = await bcrypt.hash("demo123", 10);
     const customerHash = await bcrypt.hash("demo123", 10);
+    const artisanHash = await bcrypt.hash("demo123", 10);
 
     await client.query(
       `INSERT INTO users (email, password_hash, name, phone, role)
        VALUES ($1, $2, $3, $4, 'admin')
        ON CONFLICT (email)
-       DO UPDATE SET name = EXCLUDED.name, phone = EXCLUDED.phone, role = EXCLUDED.role`,
+       DO UPDATE SET
+         password_hash = EXCLUDED.password_hash,
+         name = EXCLUDED.name,
+         phone = EXCLUDED.phone,
+         role = EXCLUDED.role`,
       ["admin@example.com", adminHash, "Admin User", "+880 1700 000000"]
     );
 
@@ -450,9 +455,27 @@ async function seedData() {
       `INSERT INTO users (email, password_hash, name, phone, role)
        VALUES ($1, $2, $3, $4, 'customer')
        ON CONFLICT (email)
-       DO UPDATE SET name = EXCLUDED.name, phone = EXCLUDED.phone, role = EXCLUDED.role`,
-      ["user@example.com", customerHash, "Demo Customer", "+880 1800 000000"]
+       DO UPDATE SET
+         password_hash = EXCLUDED.password_hash,
+         name = EXCLUDED.name,
+         phone = EXCLUDED.phone,
+         role = EXCLUDED.role`,
+      ["user@example.com", customerHash, "Ayesha Rahman", "+880 1800 000000"]
     );
+
+    const artisanUserResult = await client.query(
+      `INSERT INTO users (email, password_hash, name, phone, role)
+       VALUES ($1, $2, $3, $4, 'artisan')
+       ON CONFLICT (email)
+       DO UPDATE SET
+         password_hash = EXCLUDED.password_hash,
+         name = EXCLUDED.name,
+         phone = EXCLUDED.phone,
+         role = EXCLUDED.role
+       RETURNING id`,
+      ["artisan@example.com", artisanHash, "Fatima Begum", "+880 1900 000000"]
+    );
+    const artisanUserId = artisanUserResult.rows[0].id;
 
     for (const district of DISTRICTS) {
       await client.query(
@@ -485,6 +508,7 @@ async function seedData() {
       await client.query(
         `INSERT INTO artisans (
            id,
+           user_id,
            name,
            image,
            district_id,
@@ -494,9 +518,10 @@ async function seedData() {
            years_of_experience,
            active
          )
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, TRUE)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, TRUE)
          ON CONFLICT (id)
          DO UPDATE SET
+           user_id = EXCLUDED.user_id,
            name = EXCLUDED.name,
            image = EXCLUDED.image,
            district_id = EXCLUDED.district_id,
@@ -506,6 +531,7 @@ async function seedData() {
            years_of_experience = EXCLUDED.years_of_experience`,
         [
           artisan.id,
+          artisan.id === "artisan-001" ? artisanUserId : null,
           artisan.name,
           artisan.image,
           artisan.districtId,
@@ -601,4 +627,3 @@ async function seedData() {
 module.exports = {
   seedData,
 };
-

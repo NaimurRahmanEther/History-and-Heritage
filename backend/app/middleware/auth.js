@@ -17,9 +17,16 @@ async function requireAuth(req, res, next) {
 
     const payload = verifyToken(token);
     const userResult = await query(
-      `SELECT id, email, name, phone, role
-       FROM users
-       WHERE id = $1
+      `SELECT
+         u.id,
+         u.email,
+         u.name,
+         u.phone,
+         u.role,
+         a.id AS artisan_id
+       FROM users u
+       LEFT JOIN artisans a ON a.user_id = u.id
+       WHERE u.id = $1
        LIMIT 1`,
       [payload.sub]
     );
@@ -42,8 +49,23 @@ function requireAdmin(req, res, next) {
   return next();
 }
 
+function requireArtisan(req, res, next) {
+  if (!req.user || req.user.role !== "artisan") {
+    return res.status(403).json({ message: "Artisan access required." });
+  }
+  return next();
+}
+
+function requireAdminOrArtisan(req, res, next) {
+  if (!req.user || (req.user.role !== "admin" && req.user.role !== "artisan")) {
+    return res.status(403).json({ message: "Admin or artisan access required." });
+  }
+  return next();
+}
+
 module.exports = {
   requireAuth,
   requireAdmin,
+  requireArtisan,
+  requireAdminOrArtisan,
 };
-

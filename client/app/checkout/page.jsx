@@ -296,38 +296,38 @@ export default function CheckoutPage() {
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
                         <Label htmlFor="fullName">Full Name *</Label>
-                        <Input id="fullName" name="fullName" value={formData.fullName} onChange={handleInputChange} placeholder="John Doe" className="mt-2"/>
+                        <Input id="fullName" name="fullName" value={formData.fullName} onChange={handleInputChange} placeholder="Enter your full name" className="mt-2"/>
                       </div>
                       <div>
                         <Label htmlFor="email">Email *</Label>
-                        <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="you@example.com" className="mt-2"/>
+                        <Input id="email" name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="Enter your email address" className="mt-2"/>
                       </div>
                     </div>
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
                         <Label htmlFor="phone">Phone Number *</Label>
-                        <Input id="phone" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+880 1XXX-XXXXXX" className="mt-2"/>
+                        <Input id="phone" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="Enter your phone number" className="mt-2"/>
                       </div>
                       <div>
                         <Label htmlFor="postalCode">Postal Code</Label>
-                        <Input id="postalCode" name="postalCode" value={formData.postalCode} onChange={handleInputChange} placeholder="Postal Code" className="mt-2"/>
+                        <Input id="postalCode" name="postalCode" value={formData.postalCode} onChange={handleInputChange} placeholder="Enter postal code" className="mt-2"/>
                       </div>
                     </div>
 
                     <div>
                       <Label htmlFor="address">Street Address *</Label>
-                      <Input id="address" name="address" value={formData.address} onChange={handleInputChange} placeholder="123 Main Street" className="mt-2"/>
+                      <Input id="address" name="address" value={formData.address} onChange={handleInputChange} placeholder="Enter street address" className="mt-2"/>
                     </div>
 
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
                         <Label htmlFor="city">City *</Label>
-                        <Input id="city" name="city" value={formData.city} onChange={handleInputChange} placeholder="Dhaka" className="mt-2"/>
+                        <Input id="city" name="city" value={formData.city} onChange={handleInputChange} placeholder="Enter city" className="mt-2"/>
                       </div>
                       <div>
                         <Label htmlFor="district">District *</Label>
-                        <Input id="district" name="district" value={formData.district} onChange={handleInputChange} placeholder="Dhaka" className="mt-2"/>
+                        <Input id="district" name="district" value={formData.district} onChange={handleInputChange} placeholder="Enter district" className="mt-2"/>
                       </div>
                     </div>
                   </div>

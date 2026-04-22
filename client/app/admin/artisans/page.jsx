@@ -116,7 +116,7 @@ export default function AdminArtisansPage() {
         const newArtisan = {
             id: `artisan-${slugify(form.name)}-${Date.now()}`,
             name: form.name.trim(),
-            image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80",
+            image: "",
             district: district.name,
             districtId: district.id,
             specialty: form.specialty.trim(),
@@ -185,7 +185,7 @@ export default function AdminArtisansPage() {
             </div>
             <div className="space-y-2">
               <Label>Specialty *</Label>
-              <Input value={form.specialty} onChange={(event) => setForm({ ...form, specialty: event.target.value })} placeholder="Jamdani Weaving"/>
+              <Input value={form.specialty} onChange={(event) => setForm({ ...form, specialty: event.target.value })} placeholder="Enter specialty"/>
             </div>
             <div className="space-y-2">
               <Label>District *</Label>

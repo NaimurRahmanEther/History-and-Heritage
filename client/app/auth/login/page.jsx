@@ -20,7 +20,6 @@ export default function LoginPage() {
         e.preventDefault();
         setError("");
         setIsLoading(true);
-        // Mock login validation
         if (!email || !password) {
             setError("Please fill in all fields");
             setIsLoading(false);
@@ -62,7 +61,7 @@ export default function LoginPage() {
               <Label htmlFor="email">Email Address</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"/>
-                <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10"/>
+                <Input id="email" type="email" placeholder="Enter your email address" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10"/>
               </div>
             </div>
 
@@ -76,7 +75,7 @@ export default function LoginPage() {
               </div>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground"/>
-                <Input id="password" type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10"/>
+                <Input id="password" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10"/>
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   {showPassword ? (<EyeOff className="h-5 w-5"/>) : (<Eye className="h-5 w-5"/>)}
                 </button>
@@ -88,12 +87,6 @@ export default function LoginPage() {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
 
-            {/* Demo Credentials */}
-            <div className="rounded-lg border border-border bg-card p-4 text-sm">
-              <p className="font-medium text-foreground mb-2">Demo Credentials:</p>
-              <p className="text-muted-foreground">User: user@example.com</p>
-              <p className="text-muted-foreground">Password: demo123</p>
-            </div>
           </form>
 
           {/* Sign Up Link */}

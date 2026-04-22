@@ -64,6 +64,7 @@ export default function ArtisanDetailPage({ params, }) {
         <Footer />
       </div>);
     }
+    const artisanImage = artisan.image || "/images/artisans/artisan.webp";
     return (<div className="min-h-screen bg-background">
       <Navbar />
 
@@ -81,13 +82,13 @@ export default function ArtisanDetailPage({ params, }) {
 
         <section className="relative overflow-hidden border-b border-border">
           <div className="absolute inset-0 -z-10">
-            <Image src={artisan.image} alt={artisan.name} fill className="object-cover opacity-10 blur-sm"/>
+            <Image src={artisanImage} alt={artisan.name} fill className="object-cover opacity-10 blur-sm"/>
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 to-background/70"/>
           </div>
           <div className="mx-auto max-w-7xl px-4 py-16 lg:px-8 lg:py-24">
             <div className="grid gap-8 lg:grid-cols-3 lg:gap-12">
               <div className="relative aspect-[3/4] overflow-hidden rounded-lg lg:aspect-auto lg:h-96">
-                <Image src={artisan.image} alt={artisan.name} fill className="object-cover" priority sizes="(max-width: 1024px) 100vw, 33vw"/>
+                <Image src={artisanImage} alt={artisan.name} fill className="object-cover" priority sizes="(max-width: 1024px) 100vw, 33vw"/>
               </div>
 
               <div className="lg:col-span-2">

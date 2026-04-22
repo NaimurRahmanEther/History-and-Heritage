@@ -13,6 +13,9 @@ export function ProductCard({ product, className }) {
     const [isAdding, setIsAdding] = useState(false);
     const { addItem } = useCart();
     const { toast } = useToast();
+    const discountPercent = product.originalPrice && product.originalPrice > product.price
+        ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+        : 0;
     const getAddToCartLabel = () => {
         if (isAdding)
             return "Adding...";
@@ -37,8 +40,8 @@ export function ProductCard({ product, className }) {
       <div className="relative aspect-square overflow-hidden bg-muted">
         <Image src={product.image} alt={product.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"/>
         {/* Discount Badge */}
-        {product.originalPrice && (<Badge className="absolute left-3 top-3 bg-primary text-primary-foreground">
-            {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+        {discountPercent > 0 && (<Badge className="absolute left-3 top-3 bg-primary text-primary-foreground">
+            {discountPercent}% OFF
           </Badge>)}
         {/* Quick Actions */}
         <div className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-center gap-2 bg-linear-to-t from-background/90 to-transparent p-4 transition-transform duration-300 group-hover:translate-y-0">
@@ -91,7 +94,7 @@ export function ProductCard({ product, className }) {
           <span className="font-serif text-xl font-bold text-foreground">
             {formatPrice(product.price)}
           </span>
-          {product.originalPrice && (<span className="text-sm text-muted-foreground line-through">
+          {discountPercent > 0 && (<span className="text-sm text-muted-foreground line-through">
               {formatPrice(product.originalPrice)}
             </span>)}
         </div>

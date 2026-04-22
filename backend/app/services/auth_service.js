@@ -9,6 +9,7 @@ function mapUser(row) {
     name: row.name,
     role: row.role,
     phone: row.phone || "",
+    artisanId: row.artisan_id || "",
   };
 }
 
@@ -43,13 +44,11 @@ async function registerUser(payload) {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const role = payload.role === "admin" ? "admin" : "customer";
-
   const insertResult = await query(
     `INSERT INTO users (email, password_hash, name, phone, role)
      VALUES ($1, $2, $3, $4, $5)
-     RETURNING id, email, name, phone, role`,
-    [email, passwordHash, fullName, phone, role]
+     RETURNING id, email, name, phone, role, NULL::TEXT AS artisan_id`,
+    [email, passwordHash, fullName, phone, "customer"]
   );
 
   const user = insertResult.rows[0];
@@ -74,9 +73,17 @@ async function loginUser(payload) {
   }
 
   const result = await query(
-    `SELECT id, email, password_hash, name, phone, role
-     FROM users
-     WHERE email = $1
+    `SELECT
+       u.id,
+       u.email,
+       u.password_hash,
+       u.name,
+       u.phone,
+       u.role,
+       a.id AS artisan_id
+     FROM users u
+     LEFT JOIN artisans a ON a.user_id = u.id
+     WHERE u.email = $1
      LIMIT 1`,
     [email]
   );
@@ -144,6 +151,21 @@ module.exports = {
       throw error;
     }
 
-    return mapUser(result.rows[0]);
+    const profileResult = await query(
+      `SELECT
+         u.id,
+         u.email,
+         u.name,
+         u.phone,
+         u.role,
+         a.id AS artisan_id
+       FROM users u
+       LEFT JOIN artisans a ON a.user_id = u.id
+       WHERE u.id = $1
+       LIMIT 1`,
+      [userId]
+    );
+
+    return mapUser(profileResult.rows[0]);
   },
 };

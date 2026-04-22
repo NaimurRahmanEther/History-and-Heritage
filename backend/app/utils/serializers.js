@@ -36,6 +36,9 @@ function mapProductRow(row) {
     description: row.description || "",
     artisanId: row.artisan_id || "",
     inStock: Boolean(row.in_stock),
+    approvalStatus: row.approval_status || "approved",
+    approvalNote: row.approval_note || "",
+    approvedAt: row.approved_at ? new Date(row.approved_at).toISOString() : undefined,
     craftProcess: row.craft_process || undefined,
     culturalSignificance: row.cultural_significance || undefined,
   };
@@ -59,6 +62,10 @@ function mapAdminProductRow(row) {
     image: fallbackImage,
     images,
     inStock: Boolean(row.in_stock),
+    approvalStatus: row.approval_status || "approved",
+    approvalNote: row.approval_note || "",
+    approvedBy: row.approved_by || "",
+    approvedAt: row.approved_at ? new Date(row.approved_at).toISOString() : undefined,
     createdAt: row.created_at ? new Date(row.created_at).toISOString() : new Date().toISOString(),
   };
 }
@@ -142,4 +149,3 @@ module.exports = {
   mapArtisanRow,
   mapOrderRow,
 };
-

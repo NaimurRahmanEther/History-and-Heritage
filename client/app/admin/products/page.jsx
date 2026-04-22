@@ -12,9 +12,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, } from "@/components/ui/dialog";
-import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye, Package, Filter, AlertCircle, Download, } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye, Package, Filter, AlertCircle, Download, CheckCircle2, XCircle, } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getAdminCategories, getAdminDistricts, getAdminProducts, getCurrentUser, isAdminUser, saveAdminProducts, } from "@/lib/admin-store";
+import { getAdminCategories, getAdminDistricts, getAdminProducts, getCurrentUser, isAdminUser, saveAdminProducts, updateAdminProductApproval, } from "@/lib/admin-store";
 export default function AdminProductsPage() {
     const router = useRouter();
     const { toast } = useToast();
@@ -22,6 +22,7 @@ export default function AdminProductsPage() {
     const [categoryFilter, setCategoryFilter] = useState("all");
     const [districtFilter, setDistrictFilter] = useState("all");
     const [stockFilter, setStockFilter] = useState("all");
+    const [approvalFilter, setApprovalFilter] = useState("all");
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [products, setProducts] = useState([]);
@@ -71,6 +72,23 @@ export default function AdminProductsPage() {
         setSelectedProduct(product);
         setDeleteDialogOpen(true);
     };
+    const handleApprovalUpdate = async (product, status) => {
+        try {
+            const updated = await updateAdminProductApproval(product.id, status, status === "rejected" ? "Please review and resubmit this product." : "");
+            setProducts((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
+            toast({
+                title: status === "approved" ? "Product approved" : "Product rejected",
+                description: `${product.name} was ${status}.`,
+            });
+        }
+        catch (error) {
+            toast({
+                title: "Update failed",
+                description: error instanceof Error ? error.message : "Could not update approval status.",
+                variant: "destructive",
+            });
+        }
+    };
     const confirmDelete = async () => {
         if (!selectedProduct)
             return;
@@ -103,9 +121,11 @@ export default function AdminProductsPage() {
             const matchesStock = stockFilter === "all" ||
                 (stockFilter === "instock" && product.inStock) ||
                 (stockFilter === "outofstock" && !product.inStock);
-            return matchesSearch && matchesCategory && matchesDistrict && matchesStock;
+            const productApprovalStatus = product.approvalStatus || "approved";
+            const matchesApproval = approvalFilter === "all" || productApprovalStatus === approvalFilter;
+            return matchesSearch && matchesCategory && matchesDistrict && matchesStock && matchesApproval;
         });
-    }, [products, searchQuery, categoryFilter, districtFilter, stockFilter]);
+    }, [products, searchQuery, categoryFilter, districtFilter, stockFilter, approvalFilter]);
     const handleExport = () => {
         const payload = JSON.stringify(products, null, 2);
         const blob = new Blob([payload], { type: "application/json" });
@@ -181,12 +201,14 @@ export default function AdminProductsPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Categories
+              Pending Approval
             </CardTitle>
-            <Filter className="h-4 w-4 text-muted-foreground"/>
+            <Filter className="h-4 w-4 text-amber-500"/>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{categories.length}</div>
+            <div className="text-2xl font-bold">
+              {products.filter((product) => (product.approvalStatus || "approved") === "pending").length}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -231,6 +253,17 @@ export default function AdminProductsPage() {
                   <SelectItem value="outofstock">Out of Stock</SelectItem>
                 </SelectContent>
               </Select>
+              <Select value={approvalFilter} onValueChange={setApprovalFilter}>
+                <SelectTrigger className="w-[170px]">
+                  <SelectValue placeholder="Approval"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Approval</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>
@@ -247,17 +280,18 @@ export default function AdminProductsPage() {
                   <TableHead className="hidden md:table-cell">Category</TableHead>
                   <TableHead className="hidden lg:table-cell">District</TableHead>
                   <TableHead>Price</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Approval</TableHead>
+                  <TableHead>Stock</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {!hydrated ? (<TableRow>
-                    <TableCell colSpan={7} className="py-8 text-center">
+                    <TableCell colSpan={8} className="py-8 text-center">
                       Loading...
                     </TableCell>
                   </TableRow>) : filteredProducts.length === 0 ? (<TableRow>
-                    <TableCell colSpan={7} className="py-8 text-center">
+                    <TableCell colSpan={8} className="py-8 text-center">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <Package className="h-8 w-8 text-muted-foreground"/>
                         <p className="text-muted-foreground">
@@ -294,6 +328,15 @@ export default function AdminProductsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
+                        <Badge variant="outline" className={(product.approvalStatus || "approved") === "approved"
+                ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600"
+                : (product.approvalStatus || "approved") === "pending"
+                    ? "border-amber-500/20 bg-amber-500/10 text-amber-600"
+                    : "border-red-500/20 bg-red-500/10 text-red-600"}>
+                          {(product.approvalStatus || "approved").charAt(0).toUpperCase() + (product.approvalStatus || "approved").slice(1)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
                         <Badge variant="outline" className={product.inStock
                 ? "border-green-500/20 bg-green-500/10 text-green-600"
                 : "border-red-500/20 bg-red-500/10 text-red-600"}>
@@ -311,7 +354,7 @@ export default function AdminProductsPage() {
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
-                              <Link href={`/products/${product.id}`}>
+                              <Link href={`/admin/products/${product.id}/edit`}>
                                 <Eye className="mr-2 h-4 w-4"/>
                                 View Product
                               </Link>
@@ -322,6 +365,14 @@ export default function AdminProductsPage() {
                                 Edit
                               </Link>
                             </DropdownMenuItem>
+                            {(product.approvalStatus || "approved") !== "approved" && (<DropdownMenuItem onClick={() => handleApprovalUpdate(product, "approved")}>
+                                <CheckCircle2 className="mr-2 h-4 w-4"/>
+                                Approve
+                              </DropdownMenuItem>)}
+                            {(product.approvalStatus || "approved") !== "rejected" && (<DropdownMenuItem onClick={() => handleApprovalUpdate(product, "rejected")}>
+                                <XCircle className="mr-2 h-4 w-4"/>
+                                Reject
+                              </DropdownMenuItem>)}
                             <DropdownMenuSeparator />
                             <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => handleDelete(product)}>
                               <Trash2 className="mr-2 h-4 w-4"/>

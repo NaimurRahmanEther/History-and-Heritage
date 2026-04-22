@@ -5,13 +5,14 @@ const cors = require("cors");
 const morgan = require("morgan");
 const multer = require("multer");
 const config = require("./config");
-const { requireAuth, requireAdmin } = require("./middleware/auth");
+const { requireAuth, requireAdminOrArtisan } = require("./middleware/auth");
 
 const authRoutes = require("./routes/auth_routes");
 const catalogRoutes = require("./routes/catalog_routes");
 const cartRoutes = require("./routes/cart_routes");
 const orderRoutes = require("./routes/order_routes");
 const adminRoutes = require("./routes/admin_routes");
+const artisanRoutes = require("./routes/artisan_routes");
 
 function normalizeCorsOrigin(originValue) {
   return originValue
@@ -83,7 +84,7 @@ function createApp() {
   app.post(
     "/api/uploads/images",
     requireAuth,
-    requireAdmin,
+    requireAdminOrArtisan,
     upload.single("image"),
     (req, res) => {
       if (!req.file) {
@@ -103,6 +104,7 @@ function createApp() {
   app.use("/api/cart", cartRoutes);
   app.use("/api/orders", orderRoutes);
   app.use("/api/admin", adminRoutes);
+  app.use("/api/artisan", artisanRoutes);
 
   app.use((req, res) => {
     res.status(404).json({ message: `Route not found: ${req.method} ${req.originalUrl}` });
@@ -137,4 +139,3 @@ function createApp() {
 module.exports = {
   createApp,
 };
-

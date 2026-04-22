@@ -59,7 +59,9 @@ async function getCartByUserId(userId) {
          '[]'::json
        ) AS images
      FROM cart_items ci
-     INNER JOIN products p ON p.id = ci.product_id
+     INNER JOIN products p
+       ON p.id = ci.product_id
+      AND p.approval_status = 'approved'
      INNER JOIN categories c ON c.id = p.category_id
      INNER JOIN districts d ON d.id = p.district_id
      WHERE ci.cart_id = $1
@@ -92,9 +94,16 @@ async function getCartByUserId(userId) {
 async function addCartItem(userId, productId, quantity) {
   const qty = Math.max(1, Math.floor(Number(quantity || 1)));
 
-  const productResult = await query(`SELECT id FROM products WHERE id = $1 LIMIT 1`, [productId]);
+  const productResult = await query(
+    `SELECT id
+     FROM products
+     WHERE id = $1
+       AND approval_status = 'approved'
+     LIMIT 1`,
+    [productId]
+  );
   if (productResult.rowCount === 0) {
-    const error = new Error("Product not found.");
+    const error = new Error("Product is not available for purchase.");
     error.statusCode = 404;
     throw error;
   }
@@ -123,6 +132,20 @@ async function updateCartItem(userId, productId, quantity) {
       [cartId, productId]
     );
   } else {
+    const productResult = await query(
+      `SELECT id
+       FROM products
+       WHERE id = $1
+         AND approval_status = 'approved'
+       LIMIT 1`,
+      [productId]
+    );
+    if (productResult.rowCount === 0) {
+      const error = new Error("Product is not available for purchase.");
+      error.statusCode = 404;
+      throw error;
+    }
+
     await query(
       `INSERT INTO cart_items (cart_id, product_id, quantity)
        VALUES ($1, $2, $3)
@@ -168,7 +191,10 @@ async function syncCart(userId, items) {
 
       await client.query(
         `INSERT INTO cart_items (cart_id, product_id, quantity)
-         VALUES ($1, $2, $3)
+         SELECT $1, p.id, $3
+         FROM products p
+         WHERE p.id = $2
+           AND p.approval_status = 'approved'
          ON CONFLICT (cart_id, product_id)
          DO UPDATE SET quantity = EXCLUDED.quantity`,
         [cartId, productId, quantity]
@@ -196,4 +222,3 @@ module.exports = {
   clearCart,
   syncCart,
 };
-

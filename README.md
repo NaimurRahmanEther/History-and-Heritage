@@ -1,32 +1,31 @@
-# Traditional Market (Frontend + Backend)
+# Traditional Market
 
-This project is now split into:
+Traditional Market is a full-stack marketplace for authentic handmade products.
 
-1. Frontend (Next.js) in [`client/`](client)
-2. Backend (Express + PostgreSQL + JWT + local file upload) in [`backend/`](backend)
-
-The frontend UI/UX is preserved while data is served from PostgreSQL APIs.
+- Frontend: Next.js (in `client/`)
+- Backend: Express + PostgreSQL (in `backend/`)
 
 ## Tech Stack
 
-- Frontend: Next.js 16, React 19, JavaScript, Tailwind CSS
-- Backend: Express, raw SQL (`pg`), JWT auth, Multer uploads
+- Frontend: Next.js 16, React 19, Tailwind CSS
+- Backend: Express, `pg`, JWT auth, Multer uploads
 - Database: PostgreSQL
 
 ## Project Structure
 
 ```text
 client/
-  app/                Next.js app router (frontend)
-  components/         Frontend UI components
-  lib/                Frontend API/data/auth/cart layer
+  app/                Next.js app router
+  components/         UI components
+  lib/                API, auth, and data layer
+
 backend/
   app/
-    routes/           API routes (care-meal style layering)
-    services/         Business logic + SQL calls
-    utils/            JWT/serializers/helpers
-    seed/             Seed data
+    routes/           API routes
+    services/         Business logic + SQL
     middleware/       Auth middleware
+    utils/            Helpers and serializers
+    seed/             Seed data
   database/
     traditional_market_schema.sql
   scripts/
@@ -34,55 +33,126 @@ backend/
   run.js
 ```
 
-## Quick Start (Clone & Run)
+## Prerequisites
 
-This repository includes the real `.env` files. After cloning, run:
+- Node.js 20+ and npm
+- PostgreSQL 14+ (local or remote)
+
+## Setup From a Fresh Clone
+
+### 1. Clone the repository
 
 ```bash
-# install dependencies
+git clone <your-repo-url>
+cd tradtional-market
+```
+
+### 2. Install dependencies
+
+```bash
 npm install --prefix backend
 npm install --prefix client
+```
 
-# initialize database schema + seed data
+### 3. Create environment files
+
+Create `backend/.env` from `backend/.env.example` and `client/.env.local` from `client/.env.local.example`.
+
+macOS/Linux:
+
+```bash
+cp backend/.env.example backend/.env
+cp client/.env.local.example client/.env.local
+```
+
+Windows PowerShell:
+
+```powershell
+Copy-Item backend/.env.example backend/.env
+Copy-Item client/.env.local.example client/.env.local
+```
+
+### 4. Update environment values
+
+Update these values in `backend/.env`:
+
+- `DATABASE_URL` (required): PostgreSQL connection string
+- `JWT_SECRET` (required): long random secret
+- `CORS_ORIGIN` (required if frontend URL is not default)
+- `PORT` (optional, default `5000`)
+- `DB_SSL` (optional, set `true` for managed DBs that require SSL)
+
+Update this value in `client/.env.local`:
+
+- `NEXT_PUBLIC_API_BASE_URL` (normally `http://localhost:5000/api`)
+
+### 5. Initialize database schema and seed data
+
+From project root:
+
+```bash
 npm run db:init
+```
 
-# start backend (terminal 1)
+Or from backend folder:
+
+```bash
+cd backend
+npm run db:init
+```
+
+This command:
+
+- creates the target database if it does not exist
+- applies schema from `backend/database/traditional_market_schema.sql`
+- inserts seed data (users, categories, districts, artisans, products)
+
+### 6. Run the app
+
+Use two terminals from project root:
+
+Terminal 1 (backend):
+
+```bash
 npm run dev:backend
+```
 
-# start frontend (terminal 2)
+Terminal 2 (frontend):
+
+```bash
 npm run dev:client
 ```
 
-Backend runs on `http://localhost:5000`  
-Frontend runs on `http://localhost:3000`
+App URLs:
 
-## What To Update After Clone
+- Frontend: `http://localhost:3000`
+- Backend API: `http://localhost:5000/api`
+- Health check: `http://localhost:5000/api/health`
 
-Update these values with valid data for your machine or hosted services:
+## Seed Login Accounts (Development)
 
-- `backend/.env`
-  - `DATABASE_URL` (PostgreSQL connection string)
-  - `JWT_SECRET` (any long random string)
-  - `CORS_ORIGIN` (frontend URL, default `http://localhost:3000`)
-- `client/.env.local`
-  - `NEXT_PUBLIC_API_BASE_URL` (backend base URL, default `http://localhost:5000/api`)
+After `npm run db:init`, these users are available:
 
-## Prerequisites
+- Admin: `admin@example.com` / `demo123`
+- Customer: `user@example.com` / `demo123`
+- Artisan: `artisan@example.com` / `demo123`
 
-1. Node.js 20+
-2. PostgreSQL running locally (or the DB in your `.env` must be reachable)
+## What Must Be Updated After Clone
 
-## Database Notes
+Before sharing or deploying, update these immediately:
 
-- The database is created (if missing) and seeded by `npm run db:init`.
-- Seeded demo users:
-  - Admin: `admin@example.com` / `demo123`
-  - Customer: `user@example.com` / `demo123`
+1. Replace `JWT_SECRET` in `backend/.env` with a strong secret.
+2. Set a real `DATABASE_URL` for your environment.
+3. Set `CORS_ORIGIN` to your frontend domain(s).
+4. Set `NEXT_PUBLIC_API_BASE_URL` to your backend API URL.
+5. Replace or remove demo users/passwords in `backend/app/seed/seed_data.js`.
+6. Review upload storage settings (`UPLOAD_DIR`, max size, file access policy).
 
-## Notes
+## Useful Scripts
 
-1. Authentication is JWT-based.
-2. Cart is persisted in PostgreSQL for logged-in users.
-3. Guest cart is temporarily kept client-side and synced to DB after login.
-4. Product images can be uploaded from local drive via backend upload endpoint and are stored in `backend/uploads/`.
-5. Backend structure was aligned to your referenced `care-meal` style (`app/routes`, `app/services`, `app/utils`, `app/seed`, `database`).
+From repository root:
+
+- `npm run db:init` -> initialize database + seed
+- `npm run dev:backend` -> start backend in watch mode
+- `npm run dev:client` -> start frontend dev server
+- `npm run build:client` -> build frontend

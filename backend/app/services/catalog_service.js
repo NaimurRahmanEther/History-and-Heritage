@@ -20,6 +20,7 @@ const PRODUCT_BASE_SELECT = `
     p.cultural_significance,
     p.artisan_id,
     p.in_stock,
+    p.approval_status,
     p.created_at,
     c.id AS category_id,
     c.name AS category_name,
@@ -40,7 +41,7 @@ const PRODUCT_BASE_SELECT = `
 `;
 
 function buildProductWhereClause(filters) {
-  const clauses = ["c.active = TRUE", "d.active = TRUE"];
+  const clauses = ["c.active = TRUE", "d.active = TRUE", "p.approval_status = 'approved'"];
   const values = [];
 
   if (filters.search) {
@@ -98,7 +99,10 @@ async function getCatalogProducts(filters = {}) {
 async function getCatalogProductById(id) {
   const result = await query(
     `${PRODUCT_BASE_SELECT}
-     WHERE p.id = $1 AND c.active = TRUE AND d.active = TRUE
+     WHERE p.id = $1
+       AND c.active = TRUE
+       AND d.active = TRUE
+       AND p.approval_status = 'approved'
      LIMIT 1`,
     [id]
   );
@@ -117,7 +121,9 @@ async function getCategories(includeInactive = false) {
        c.created_at,
        COUNT(p.id)::int AS product_count
      FROM categories c
-     LEFT JOIN products p ON p.category_id = c.id
+     LEFT JOIN products p
+       ON p.category_id = c.id
+      AND p.approval_status = 'approved'
      GROUP BY c.id
      ORDER BY c.name ASC`
   );
@@ -137,7 +143,9 @@ async function getCategoryById(id) {
        c.created_at,
        COUNT(p.id)::int AS product_count
      FROM categories c
-     LEFT JOIN products p ON p.category_id = c.id
+     LEFT JOIN products p
+       ON p.category_id = c.id
+      AND p.approval_status = 'approved'
      WHERE c.id = $1
      GROUP BY c.id`,
     [id]
@@ -158,7 +166,9 @@ async function getDistricts(includeInactive = false) {
        d.created_at,
        COUNT(p.id)::int AS product_count
      FROM districts d
-     LEFT JOIN products p ON p.district_id = d.id
+     LEFT JOIN products p
+       ON p.district_id = d.id
+      AND p.approval_status = 'approved'
      GROUP BY d.id
      ORDER BY d.name ASC`
   );
@@ -179,7 +189,9 @@ async function getDistrictById(id) {
        d.created_at,
        COUNT(p.id)::int AS product_count
      FROM districts d
-     LEFT JOIN products p ON p.district_id = d.id
+     LEFT JOIN products p
+       ON p.district_id = d.id
+      AND p.approval_status = 'approved'
      WHERE d.id = $1
      GROUP BY d.id`,
     [id]
@@ -205,7 +217,9 @@ async function getArtisans(includeInactive = false) {
        COUNT(p.id)::int AS product_count
      FROM artisans a
      INNER JOIN districts d ON d.id = a.district_id
-     LEFT JOIN products p ON p.artisan_id = a.id
+     LEFT JOIN products p
+       ON p.artisan_id = a.id
+      AND p.approval_status = 'approved'
      GROUP BY a.id, d.name
      ORDER BY a.created_at DESC`
   );
@@ -231,7 +245,9 @@ async function getArtisanById(id) {
        COUNT(p.id)::int AS product_count
      FROM artisans a
      INNER JOIN districts d ON d.id = a.district_id
-     LEFT JOIN products p ON p.artisan_id = a.id
+     LEFT JOIN products p
+       ON p.artisan_id = a.id
+      AND p.approval_status = 'approved'
      WHERE a.id = $1
      GROUP BY a.id, d.name`,
     [id]
@@ -250,4 +266,3 @@ module.exports = {
   getArtisans,
   getArtisanById,
 };
-

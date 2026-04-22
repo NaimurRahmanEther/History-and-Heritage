@@ -128,6 +128,9 @@ export function Navbar() {
                 <DropdownMenuItem asChild>
                   <Link href="/orders">My Orders</Link>
                 </DropdownMenuItem>
+                {user.role === "artisan" && (<DropdownMenuItem asChild>
+                    <Link href="/artisan">Artisan Dashboard</Link>
+                  </DropdownMenuItem>)}
                 {user.role === "admin" && (<DropdownMenuItem asChild>
                     <Link href="/admin">Admin Dashboard</Link>
                   </DropdownMenuItem>)}
@@ -177,6 +180,9 @@ export function Navbar() {
                 <Link href="/orders" onClick={() => setMobileMenuOpen(false)} className="block rounded-md px-3 py-2 text-base font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
                   My Orders
                 </Link>
+                {user.role === "artisan" && (<Link href="/artisan" onClick={() => setMobileMenuOpen(false)} className="block rounded-md px-3 py-2 text-base font-medium text-primary hover:bg-primary/10 transition-colors">
+                    Artisan Dashboard
+                  </Link>)}
                 {user.role === "admin" && (<Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="block rounded-md px-3 py-2 text-base font-medium text-primary hover:bg-primary/10 transition-colors">
                     Admin Dashboard
                   </Link>)}

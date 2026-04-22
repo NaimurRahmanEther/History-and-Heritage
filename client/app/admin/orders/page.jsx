@@ -8,10 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
-import { Search, Eye, ShoppingCart, Clock, CheckCircle, Truck } from "lucide-react";
+import { Search, Eye, ShoppingCart, Clock, CheckCircle, Truck, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatPrice } from "@/lib/data";
-import { ORDER_STATUSES, getAdminOrders, getCurrentUser, isAdminUser, updateAdminOrderStatus, } from "@/lib/admin-store";
+import { ORDER_STATUSES, deleteAdminOrder, getAdminOrders, getCurrentUser, isAdminUser, updateAdminOrderStatus, } from "@/lib/admin-store";
 const statusColors = {
     pending: "bg-orange-500/10 text-orange-600 border-orange-500/20",
     processing: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20",
@@ -79,6 +79,26 @@ export default function AdminOrdersPage() {
             toast({
                 title: "Update failed",
                 description: error instanceof Error ? error.message : "Could not update order status.",
+                variant: "destructive",
+            });
+        }
+    };
+    const handleDeleteOrder = async (orderId) => {
+        const shouldDelete = window.confirm(`Delete order ${orderId}? This cannot be undone.`);
+        if (!shouldDelete)
+            return;
+        try {
+            const updatedOrders = await deleteAdminOrder(orderId);
+            setOrders(updatedOrders);
+            toast({
+                title: "Order deleted",
+                description: `${orderId} has been removed.`,
+            });
+        }
+        catch (error) {
+            toast({
+                title: "Delete failed",
+                description: error instanceof Error ? error.message : "Could not delete order.",
                 variant: "destructive",
             });
         }
@@ -216,11 +236,16 @@ export default function AdminOrdersPage() {
                         </Select>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/order-confirmation/${order.id}`}>
-                            <Eye className="h-4 w-4"/>
-                          </Link>
-                        </Button>
+                        <div className="flex items-center justify-end gap-1">
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link href={`/order-confirmation/${order.id}`}>
+                              <Eye className="h-4 w-4"/>
+                            </Link>
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={() => handleDeleteOrder(order.id)}>
+                            <Trash2 className="h-4 w-4 text-destructive"/>
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>)))}
               </TableBody>

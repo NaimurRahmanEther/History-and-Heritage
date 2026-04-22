@@ -141,7 +141,7 @@ function ProductsPageContent() {
         priceRange[0] > 0 ||
         priceRange[1] < maxPrice ||
         minRating > 0);
-    const FilterContent = () => (<div className="space-y-8">
+    const renderFilterContent = () => (<div className="space-y-8">
       {/* Search */}
       <div>
         <Label className="text-sm font-semibold">Search</Label>
@@ -231,7 +231,7 @@ function ProductsPageContent() {
                     Filters
                   </h2>
                   <div className="mt-6">
-                    <FilterContent />
+                    {renderFilterContent()}
                   </div>
                 </div>
               </aside>
@@ -257,7 +257,7 @@ function ProductsPageContent() {
                           <SheetTitle>Filters</SheetTitle>
                         </SheetHeader>
                         <div className="mt-6">
-                          <FilterContent />
+                          {renderFilterContent()}
                         </div>
                       </SheetContent>
                     </Sheet>

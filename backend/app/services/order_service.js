@@ -59,7 +59,9 @@ async function createOrderFromCart(userId, payload) {
   const cartItemsResult = await query(
     `SELECT ci.product_id, ci.quantity, p.price
      FROM cart_items ci
-     INNER JOIN products p ON p.id = ci.product_id
+     INNER JOIN products p
+       ON p.id = ci.product_id
+      AND p.approval_status = 'approved'
      WHERE ci.cart_id = $1`,
     [cartId]
   );
@@ -208,6 +210,21 @@ async function updateOrderStatus(orderId, status) {
   return mapOrderRow(order);
 }
 
+async function deleteOrder(orderId) {
+  const result = await query(
+    `DELETE FROM orders
+     WHERE id = $1
+     RETURNING id`,
+    [orderId]
+  );
+
+  if (result.rowCount === 0) {
+    const error = new Error("Order not found.");
+    error.statusCode = 404;
+    throw error;
+  }
+}
+
 module.exports = {
   ORDER_STATUSES,
   createOrderFromCart,
@@ -215,5 +232,5 @@ module.exports = {
   listAllOrders,
   getOrderById,
   updateOrderStatus,
+  deleteOrder,
 };
-

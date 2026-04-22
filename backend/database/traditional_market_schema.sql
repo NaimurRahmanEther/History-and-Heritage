@@ -6,10 +6,25 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT NOT NULL,
   name TEXT NOT NULL,
   phone TEXT,
-  role TEXT NOT NULL DEFAULT 'customer' CHECK (role IN ('admin', 'customer')),
+  role TEXT NOT NULL DEFAULT 'customer' CHECK (role IN ('admin', 'customer', 'artisan')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'users_role_check'
+  ) THEN
+    ALTER TABLE users DROP CONSTRAINT users_role_check;
+  END IF;
+END $$;
+
+ALTER TABLE users
+  ADD CONSTRAINT users_role_check
+  CHECK (role IN ('admin', 'customer', 'artisan'));
 
 CREATE TABLE IF NOT EXISTS settings (
   id SMALLINT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
@@ -46,6 +61,7 @@ CREATE TABLE IF NOT EXISTS districts (
 
 CREATE TABLE IF NOT EXISTS artisans (
   id TEXT PRIMARY KEY,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
   name TEXT NOT NULL,
   image TEXT NOT NULL,
   district_id TEXT NOT NULL REFERENCES districts(id) ON UPDATE CASCADE,
@@ -55,6 +71,41 @@ CREATE TABLE IF NOT EXISTS artisans (
   years_of_experience INTEGER NOT NULL DEFAULT 0,
   active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE artisans
+  ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES users(id) ON DELETE SET NULL;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'artisans_user_id_key'
+  ) THEN
+    ALTER TABLE artisans
+      ADD CONSTRAINT artisans_user_id_key UNIQUE (user_id);
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS artisan_applications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+  full_name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  district_id TEXT NOT NULL REFERENCES districts(id) ON UPDATE CASCADE,
+  specialty TEXT NOT NULL,
+  years_of_experience INTEGER NOT NULL DEFAULT 0,
+  bio TEXT NOT NULL,
+  story TEXT NOT NULL,
+  sample_work_url TEXT,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  rejection_reason TEXT,
+  reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
+  reviewed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS products (
@@ -72,9 +123,34 @@ CREATE TABLE IF NOT EXISTS products (
   rating NUMERIC(3, 2) NOT NULL DEFAULT 4.5,
   review_count INTEGER NOT NULL DEFAULT 0,
   in_stock BOOLEAN NOT NULL DEFAULT TRUE,
+  approval_status TEXT NOT NULL DEFAULT 'approved' CHECK (approval_status IN ('pending', 'approved', 'rejected')),
+  approval_note TEXT,
+  approved_by UUID REFERENCES users(id) ON DELETE SET NULL,
+  approved_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE products
+  ADD COLUMN IF NOT EXISTS approval_status TEXT NOT NULL DEFAULT 'approved',
+  ADD COLUMN IF NOT EXISTS approval_note TEXT,
+  ADD COLUMN IF NOT EXISTS approved_by UUID REFERENCES users(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS approved_at TIMESTAMPTZ;
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'products_approval_status_check'
+  ) THEN
+    ALTER TABLE products DROP CONSTRAINT products_approval_status_check;
+  END IF;
+END $$;
+
+ALTER TABLE products
+  ADD CONSTRAINT products_approval_status_check
+  CHECK (approval_status IN ('pending', 'approved', 'rejected'));
 
 CREATE TABLE IF NOT EXISTS product_images (
   id BIGSERIAL PRIMARY KEY,
@@ -128,8 +204,10 @@ CREATE TABLE IF NOT EXISTS order_items (
 CREATE INDEX IF NOT EXISTS idx_products_category_id ON products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_district_id ON products(district_id);
 CREATE INDEX IF NOT EXISTS idx_products_artisan_id ON products(artisan_id);
+CREATE INDEX IF NOT EXISTS idx_artisans_user_id ON artisans(user_id);
+CREATE INDEX IF NOT EXISTS idx_artisan_applications_status ON artisan_applications(status);
+CREATE INDEX IF NOT EXISTS idx_artisan_applications_district_id ON artisan_applications(district_id);
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_cart_items_cart_id ON cart_items(cart_id);
-

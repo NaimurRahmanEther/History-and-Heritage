@@ -104,6 +104,10 @@ export default function ProductDetailPage({ params }) {
         .filter((item) => item.categoryId === product.categoryId)
         .filter((p) => p.id !== product.id)
         .slice(0, 4);
+    const discountPercent = product.originalPrice && product.originalPrice > product.price
+        ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+        : 0;
+    const artisanImage = artisan?.image || "/images/artisans/artisan.webp";
     return (<div className="min-h-screen bg-background">
       <Navbar />
 
@@ -128,8 +132,8 @@ export default function ProductDetailPage({ params }) {
               <div className="space-y-4">
                 <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
                   <Image src={product.images[selectedImage]} alt={product.name} fill className="object-cover" priority sizes="(max-width: 1024px) 100vw, 50vw"/>
-                  {product.originalPrice && (<Badge className="absolute left-4 top-4 bg-primary text-primary-foreground">
-                      {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+                  {discountPercent > 0 && (<Badge className="absolute left-4 top-4 bg-primary text-primary-foreground">
+                      {discountPercent}% OFF
                     </Badge>)}
                 </div>
                 <div className="flex gap-3 overflow-x-auto pb-2">
@@ -176,7 +180,7 @@ export default function ProductDetailPage({ params }) {
                   <span className="font-serif text-4xl font-bold text-foreground">
                     {formatPrice(product.price)}
                   </span>
-                  {product.originalPrice && (<span className="text-xl text-muted-foreground line-through">
+                  {discountPercent > 0 && (<span className="text-xl text-muted-foreground line-through">
                       {formatPrice(product.originalPrice)}
                     </span>)}
                 </div>
@@ -320,21 +324,8 @@ export default function ProductDetailPage({ params }) {
                   <h3 className="font-serif text-2xl font-bold text-foreground">
                     Customer Reviews
                   </h3>
-                  <div className="mt-6 space-y-6">
-                    {[1, 2, 3].map((i) => (<div key={`review-${product.id}-${i}`} className="border-b border-border pb-6 last:border-0">
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-1">
-                            {new Array(5).fill(null).map((_, j) => (<Star key={`review-star-${product.id}-${i}-${j}`} className="h-4 w-4 fill-amber-400 text-amber-400"/>))}
-                          </div>
-                          <span className="text-sm text-muted-foreground">
-                            Verified Purchase
-                          </span>
-                        </div>
-                        <p className="mt-3 text-muted-foreground">
-                          Absolutely beautiful product! The craftsmanship is exceptional and it arrived well-packaged. Love supporting these talented artisans.
-                        </p>
-                        <p className="mt-2 text-sm font-medium">— Customer {i}</p>
-                      </div>))}
+                  <div className="mt-6 rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+                    Verified customer reviews will be displayed here after completed purchases.
                   </div>
                 </div>
               </TabsContent>
@@ -350,7 +341,7 @@ export default function ProductDetailPage({ params }) {
               </h2>
               <div className="mt-8 grid gap-8 lg:grid-cols-3">
                 <div className="relative aspect-3/4 overflow-hidden rounded-lg lg:aspect-auto lg:h-full">
-                  <Image src={artisan.image} alt={artisan.name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 33vw"/>
+                  <Image src={artisanImage} alt={artisan.name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 33vw"/>
                 </div>
                 <div className="lg:col-span-2">
                   <div className="flex items-center gap-3">

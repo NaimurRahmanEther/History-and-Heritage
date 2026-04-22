@@ -62,6 +62,14 @@ export async function updateAdminProduct(productId, product) {
     });
     return mapProductAssets(response.product);
 }
+export async function updateAdminProductApproval(productId, status, note) {
+    const response = await apiRequest(`/admin/products/${productId}/approval`, {
+        method: "PATCH",
+        withAuth: true,
+        body: JSON.stringify({ status, note }),
+    });
+    return mapProductAssets(response.product);
+}
 export async function deleteAdminProduct(productId) {
     await apiRequest(`/admin/products/${productId}`, {
         method: "DELETE",
@@ -97,12 +105,19 @@ export async function saveAdminOrders(_orders) {
     // Orders are managed through status updates in this implementation.
 }
 export async function updateAdminOrderStatus(orderId, status) {
-    await apiRequest(`/admin/orders/${orderId}/status`, {
-        method: "PATCH",
-        withAuth: true,
-        body: JSON.stringify({ status }),
-    });
-    return getAdminOrders();
+  await apiRequest(`/admin/orders/${orderId}/status`, {
+    method: "PATCH",
+    withAuth: true,
+    body: JSON.stringify({ status }),
+  });
+  return getAdminOrders();
+}
+export async function deleteAdminOrder(orderId) {
+  await apiRequest(`/admin/orders/${orderId}`, {
+    method: "DELETE",
+    withAuth: true,
+  });
+  return getAdminOrders();
 }
 export async function getAdminArtisans() {
     const response = await apiRequest("/admin/artisans", {

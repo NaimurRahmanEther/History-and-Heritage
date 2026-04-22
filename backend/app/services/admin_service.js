@@ -6,6 +6,8 @@ const {
   mapArtisanRow,
 } = require("../utils/serializers");
 
+const PRODUCT_APPROVAL_STATUSES = new Set(["pending", "approved", "rejected"]);
+
 function normalizeImageArray(images, fallbackImage) {
   const safeImages = Array.isArray(images)
     ? images.filter((item) => typeof item === "string" && item.trim().length > 0)
@@ -42,6 +44,10 @@ async function getAdminProducts() {
        p.cultural_significance,
        p.image,
        p.in_stock,
+       p.approval_status,
+       p.approval_note,
+       p.approved_by,
+       p.approved_at,
        p.created_at,
        COALESCE(
          (
@@ -58,7 +64,7 @@ async function getAdminProducts() {
   return result.rows.map(mapAdminProductRow);
 }
 
-async function createAdminProduct(payload) {
+async function createAdminProduct(payload, adminUserId) {
   const id = String(payload.id || `prod-${Date.now()}`);
   const image = String(payload.image || "").trim();
   const images = normalizeImageArray(payload.images, image);
@@ -76,10 +82,13 @@ async function createAdminProduct(payload) {
        craft_process,
        cultural_significance,
        image,
-       in_stock
+       in_stock,
+       approval_status,
+       approved_by,
+       approved_at
      )
      VALUES (
-       $1, $2, $3, $4, $5, $6, NULLIF($7, ''), $8, $9, $10, $11, $12
+       $1, $2, $3, $4, $5, $6, NULLIF($7, ''), $8, $9, $10, $11, $12, 'approved', $13, NOW()
      )
      RETURNING id`,
     [
@@ -95,6 +104,7 @@ async function createAdminProduct(payload) {
       String(payload.culturalSignificance || "").trim(),
       image,
       Boolean(payload.inStock),
+      adminUserId || null,
     ]
   );
 
@@ -174,8 +184,69 @@ async function updateAdminProduct(productId, payload) {
   return allProducts.find((item) => item.id === productId) || null;
 }
 
+async function updateAdminProductApproval(productId, status, reviewerId, note = "") {
+  const normalizedStatus = String(status || "").toLowerCase();
+  if (!PRODUCT_APPROVAL_STATUSES.has(normalizedStatus)) {
+    const error = new Error("Invalid product approval status.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const normalizedNote = String(note || "").trim();
+  const updateResult = await query(
+    `UPDATE products
+     SET
+       approval_status = $2,
+       approval_note = CASE
+         WHEN $2 = 'rejected' THEN NULLIF($3, '')
+         ELSE NULL
+       END,
+       approved_by = $4,
+       approved_at = NOW(),
+       updated_at = NOW()
+     WHERE id = $1
+     RETURNING id`,
+    [productId, normalizedStatus, normalizedNote, reviewerId || null]
+  );
+
+  if (updateResult.rowCount === 0) {
+    const error = new Error("Product not found.");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const allProducts = await getAdminProducts();
+  return allProducts.find((item) => item.id === productId) || null;
+}
+
 async function deleteAdminProduct(productId) {
-  await query(`DELETE FROM products WHERE id = $1`, [productId]);
+  const usageResult = await query(
+    `SELECT COUNT(*)::int AS order_item_count
+     FROM order_items
+     WHERE product_id = $1`,
+    [productId]
+  );
+  const orderItemCount = Number(usageResult.rows[0]?.order_item_count || 0);
+  if (orderItemCount > 0) {
+    const error = new Error(
+      `This product cannot be deleted because it is used in ${orderItemCount} order record(s).`
+    );
+    error.statusCode = 409;
+    throw error;
+  }
+
+  const result = await query(
+    `DELETE FROM products
+     WHERE id = $1
+     RETURNING id`,
+    [productId]
+  );
+
+  if (result.rowCount === 0) {
+    const error = new Error("Product not found.");
+    error.statusCode = 404;
+    throw error;
+  }
 }
 
 async function getAdminCategories() {
@@ -495,6 +566,7 @@ module.exports = {
   getAdminProducts,
   createAdminProduct,
   updateAdminProduct,
+  updateAdminProductApproval,
   deleteAdminProduct,
   getAdminCategories,
   createAdminCategory,
@@ -511,4 +583,3 @@ module.exports = {
   getAdminSettings,
   updateAdminSettings,
 };
-

@@ -4,6 +4,7 @@ const {
   getAdminProducts,
   createAdminProduct,
   updateAdminProduct,
+  updateAdminProductApproval,
   deleteAdminProduct,
   getAdminCategories,
   createAdminCategory,
@@ -20,7 +21,12 @@ const {
   getAdminSettings,
   updateAdminSettings,
 } = require("../services/admin_service");
-const { listAllOrders, updateOrderStatus } = require("../services/order_service");
+const { listAllOrders, updateOrderStatus, deleteOrder } = require("../services/order_service");
+const {
+  listArtisanApplications,
+  approveArtisanApplication,
+  rejectArtisanApplication,
+} = require("../services/artisan_application_service");
 
 const router = express.Router();
 
@@ -37,7 +43,7 @@ router.get("/products", async (_req, res, next) => {
 
 router.post("/products", async (req, res, next) => {
   try {
-    const product = await createAdminProduct(req.body || {});
+    const product = await createAdminProduct(req.body || {}, req.user.id);
     return res.status(201).json({
       message: "Product created.",
       product,
@@ -52,6 +58,28 @@ router.put("/products/:id", async (req, res, next) => {
     const product = await updateAdminProduct(req.params.id, req.body || {});
     return res.status(200).json({
       message: "Product updated.",
+      product,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.patch("/products/:id/approval", async (req, res, next) => {
+  try {
+    const status = String(req.body?.status || "").toLowerCase();
+    const product = await updateAdminProductApproval(
+      req.params.id,
+      status,
+      req.user.id,
+      req.body?.note
+    );
+
+    const message =
+      status === "approved" ? "Product approved." : status === "rejected" ? "Product rejected." : "Product updated.";
+
+    return res.status(200).json({
+      message,
       product,
     });
   } catch (error) {
@@ -84,6 +112,15 @@ router.patch("/orders/:id/status", async (req, res, next) => {
       message: "Order status updated.",
       order,
     });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.delete("/orders/:id", async (req, res, next) => {
+  try {
+    await deleteOrder(req.params.id);
+    return res.status(200).json({ message: "Order deleted." });
   } catch (error) {
     return next(error);
   }
@@ -248,5 +285,43 @@ router.put("/settings", async (req, res, next) => {
   }
 });
 
-module.exports = router;
+router.get("/artisan-applications", async (req, res, next) => {
+  try {
+    const applications = await listArtisanApplications({
+      status: req.query?.status,
+    });
+    return res.status(200).json({ applications });
+  } catch (error) {
+    return next(error);
+  }
+});
 
+router.patch("/artisan-applications/:id/approve", async (req, res, next) => {
+  try {
+    const application = await approveArtisanApplication(req.params.id, req.user.id);
+    return res.status(200).json({
+      message: "Artisan application approved.",
+      application,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.patch("/artisan-applications/:id/reject", async (req, res, next) => {
+  try {
+    const application = await rejectArtisanApplication(
+      req.params.id,
+      req.user.id,
+      req.body?.reason
+    );
+    return res.status(200).json({
+      message: "Artisan application rejected.",
+      application,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+module.exports = router;

@@ -6,6 +6,10 @@ const {
   mapUser,
   updateUserProfile,
 } = require("../services/auth_service");
+const {
+  getApplicationByUserId,
+  submitArtisanApplication,
+} = require("../services/artisan_application_service");
 
 const router = express.Router();
 
@@ -47,6 +51,27 @@ router.patch("/profile", requireAuth, async (req, res, next) => {
     return res.status(200).json({
       message: "Profile updated.",
       user,
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.get("/artisan-application/me", requireAuth, async (req, res, next) => {
+  try {
+    const application = await getApplicationByUserId(req.user.id);
+    return res.status(200).json({ application });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.post("/artisan-application", requireAuth, async (req, res, next) => {
+  try {
+    const application = await submitArtisanApplication(req.user, req.body || {});
+    return res.status(201).json({
+      message: "Artisan application submitted.",
+      application,
     });
   } catch (error) {
     return next(error);

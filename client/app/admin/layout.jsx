@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, Package, ShoppingCart, Users, FolderTree, MapPin, Settings, ChevronLeft, Menu, LogOut, Bell, Search, } from "lucide-react";
+import { FileCheck } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,8 +16,9 @@ const navigation = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Products", href: "/admin/products", icon: Package },
     { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
-    { name: "Artisans", href: "/admin/artisans", icon: Users },
-    { name: "Categories", href: "/admin/categories", icon: FolderTree },
+  { name: "Artisans", href: "/admin/artisans", icon: Users },
+  { name: "Applications", href: "/admin/artisan-applications", icon: FileCheck },
+  { name: "Categories", href: "/admin/categories", icon: FolderTree },
     { name: "Districts", href: "/admin/districts", icon: MapPin },
     { name: "Settings", href: "/admin/settings", icon: Settings },
 ];

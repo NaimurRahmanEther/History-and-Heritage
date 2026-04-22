@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Artisan } from "@/lib/data";
 export function ArtisanCard({ artisan, className }) {
+    const imageSrc = artisan.image || "/images/artisans/artisan.webp";
     return (<div className={cn("group relative overflow-hidden rounded-lg border border-border bg-card transition-all duration-300 hover:shadow-lg hover:shadow-primary/5", className)}>
       {/* Image */}
       <div className="relative aspect-[4/5] overflow-hidden">
-        <Image src={artisan.image} alt={artisan.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"/>
+        <Image src={imageSrc} alt={artisan.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"/>
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent"/>
         
         {/* Content Overlay */}
